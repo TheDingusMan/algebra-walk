@@ -1,0 +1,46 @@
+{
+    "name": "Algebra Walk",
+    "description": "",
+    "dependencies": {
+        "device": "*"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "assets.json",
+        "images.g.jres",
+        "images.g.ts",
+        "tilemap.g.jres",
+        "tilemap.g.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "targetVersions": {
+        "target": "4.0.14",
+        "targetId": "arcade"
+    },
+    "supportedTargets": [
+        "arcade"
+    ],
+    "preferredEditor": "tsprj",
+    "palette": [
+        "#000000",
+        "#FFFFFF",
+        "#FF2121",
+        "#A6A6A6",
+        "#FF8135",
+        "#FFF609",
+        "#00FFFF",
+        "#7DFF00",
+        "#003FAD",
+        "#87F2FF",
+        "#8E2EC4",
+        "#737373",
+        "#474747",
+        "#D1D1D1",
+        "#91463d",
+        "#000000"
+    ]
+}
