@@ -1,24 +1,53 @@
-namespace userconfig {
-    export const ARCADE_SCREEN_WIDTH = 320
-    export const ARCADE_SCREEN_HEIGHT = 160
+namespace SpriteKind {
+    export const Portal = SpriteKind.create()
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     aPressed = true
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherSprite) {
+    if (otherSprite.image.equals(assets.image`shipPortal`)) {
+        changeGamemode("ship")
+        remind = true
+    } else if (otherSprite.image.equals(assets.image`cubePortal`)) {
+        changeGamemode("cube")
+        remind = false
+    }
+})
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     aPressed = false
 })
+function changeGamemode (mode: string) {
+    if (mode == "cube") {
+        cube.setImage(assets.image`cube4`)
+        cube.ay = 625
+    } else if (mode == "ship") {
+        cube.setImage(assets.image`ship1`)
+        cube.ay = 0
+    }
+}
+let count2 = 0
+let count = 0
+let remind = false
+let cube: Sprite = null
 let aPressed = false
+namespace userconfig {
+    export const ARCADE_SCREEN_WIDTH = 320
+    export const ARCADE_SCREEN_HEIGHT = 160
+}
 music.play(music.createSong(assets.song`stereoMadnent`), music.PlaybackMode.InBackground)
 scene.setBackgroundColor(9)
-let count = 0
-let count2 = 0
 let on_floor = true
 aPressed = false
-let cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
+cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
+let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
+let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
+let mode = "cube"
+remind = false
 cube.ay = 625
 cube.setPosition(20, 235)
 tiles.setCurrentTilemap(tilemap`level`)
+tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
+tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
@@ -54,18 +83,39 @@ game.onUpdate(function () {
     }
 })
 forever(function () {
-    if (on_floor && aPressed) {
+    if (mode == "cube" && aPressed && on_floor) {
         on_floor = false
         cube.vy = -200
+    } else if (mode == "ship") {
+        if (aPressed) {
+            if (cube.vy < -200) {
+                cube.vy = -200
+            } else {
+                cube.vy += -7
+            }
+        } else {
+            if (cube.vy > 200) {
+                cube.vy = 200
+            } else {
+                cube.vy += 7
+            }
+        }
     }
 })
 forever(function () {
-    if (cube.tileKindAt(TileDirection.Center, assets.tile`block`) || cube.isHittingTile(CollisionDirection.Top) || (cube.tileKindAt(TileDirection.Center, assets.tile`spike`) || (cube.tileKindAt(TileDirection.Center, assets.tile`spikeLeft`) || cube.tileKindAt(TileDirection.Center, assets.tile`spikeDown`)))) {
+    if (cube.tileKindAt(TileDirection.Center, assets.tile`block`) || (cube.tileKindAt(TileDirection.Center, assets.tile`spike`) || (cube.tileKindAt(TileDirection.Center, assets.tile`spikeLeft`) || cube.tileKindAt(TileDirection.Center, assets.tile`spikeDown`)))) {
         music.stopAllSounds()
         game.gameOver(false)
     }
+    if (mode == "cube" && cube.isHittingTile(CollisionDirection.Top)) {
+        music.stopAllSounds()
+        game.gameOver(false)
+    }
+    if (remind) {
+        mode = "ship"
+    }
     cube.x += 4.5
-    if (!(on_floor)) {
+    if (mode == "cube" && !(on_floor)) {
         count += 1
         if (count == 4) {
             count = 0
@@ -81,12 +131,22 @@ forever(function () {
                 cube.setImage(assets.image`cube4`)
             }
         }
+    } else if (mode == "ship") {
+        if (cube.vy < -100) {
+            cube.setImage(assets.image`ship3`)
+        } else if (cube.vy > 100) {
+            cube.setImage(assets.image`ship2`)
+        } else {
+            cube.setImage(assets.image`ship1`)
+        }
     }
     if (cube.isHittingTile(CollisionDirection.Bottom)) {
         on_floor = true
-        count = 0
-        count2 = 0
-        cube.setImage(assets.image`cube4`)
+        if (mode == "cube") {
+            count = 0
+            count2 = 0
+            cube.setImage(assets.image`cube4`)
+        }
     } else {
         on_floor = false
     }
