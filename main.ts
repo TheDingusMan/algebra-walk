@@ -10,6 +10,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
         remind = true
     } else if (otherSprite.image.equals(assets.image`cubePortal`)) {
         changeGamemode("cube")
+        mode = "cube"
         remind = false
     }
 })
@@ -28,6 +29,7 @@ function changeGamemode (mode: string) {
 let count2 = 0
 let count = 0
 let remind = false
+let mode = ""
 let cube: Sprite = null
 let aPressed = false
 namespace userconfig {
@@ -40,14 +42,16 @@ let on_floor = true
 aPressed = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
 let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
+let shipPortal2 = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
 let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
-let mode = "cube"
+mode = "cube"
 remind = false
 cube.ay = 625
 cube.setPosition(20, 235)
 tiles.setCurrentTilemap(tilemap`level`)
 tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
+tiles.placeOnTile(shipPortal2, tiles.getTileLocation(240, 2))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
@@ -110,6 +114,9 @@ forever(function () {
     if (mode == "cube" && cube.isHittingTile(CollisionDirection.Top)) {
         music.stopAllSounds()
         game.gameOver(false)
+    }
+    if (cube.tileKindAt(TileDirection.Center, assets.tile`goal`)) {
+        game.gameOver(true)
     }
     if (remind) {
         mode = "ship"
