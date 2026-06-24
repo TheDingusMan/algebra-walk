@@ -1,6 +1,9 @@
 namespace SpriteKind {
     export const Portal = SpriteKind.create()
 }
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    upPressed = true
+})
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     aPressed = true
 })
@@ -17,6 +20,9 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     aPressed = false
 })
+controller.up.onEvent(ControllerButtonEvent.Released, function () {
+    upPressed = false
+})
 function changeGamemode (mode: string) {
     if (mode == "cube") {
         cube.setImage(assets.image`cube4`)
@@ -31,6 +37,7 @@ let count = 0
 let remind = false
 let mode = ""
 let cube: Sprite = null
+let upPressed = false
 let aPressed = false
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320
@@ -40,6 +47,7 @@ music.play(music.createSong(assets.song`stereoMadnent`), music.PlaybackMode.InBa
 scene.setBackgroundColor(9)
 let on_floor = true
 aPressed = false
+upPressed = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
 let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
 let shipPortal2 = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
@@ -87,11 +95,11 @@ game.onUpdate(function () {
     }
 })
 forever(function () {
-    if (mode == "cube" && aPressed && on_floor) {
+    if (mode == "cube" && (aPressed || upPressed) && on_floor) {
         on_floor = false
         cube.vy = -200
     } else if (mode == "ship") {
-        if (aPressed) {
+        if (aPressed || upPressed) {
             if (cube.vy < -200) {
                 cube.vy = -200
             } else {
