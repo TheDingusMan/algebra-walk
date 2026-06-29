@@ -150,6 +150,15 @@ forever(function () {
         } else {
             cube.setImage(assets.image`ship1`)
         }
+    } else if (mode == "wave") {
+        if (cube.vy < 0) {
+            cube.setImage(assets.image`wave1`)
+        } else if (cube.vy > 0) {
+            cube.setImage(assets.image`wave2`)
+        } else {
+            cube.setImage(assets.image`wave0`)
+        }
+        cube.vy = 0
     }
     if (cube.isHittingTile(CollisionDirection.Bottom)) {
         on_floor = true
@@ -182,11 +191,11 @@ forever(function () {
         }
     } else if (mode == "wave") {
         if (aPressed || upPressed) {
+            cube.vy = -0.01
             cube.y += -4.5
-            cube.setImage(assets.image`wave1`)
         } else {
+            cube.vy = 0.01
             cube.y += 4.5
-            cube.setImage(assets.image`wave2`)
         }
     }
 })
