@@ -12,13 +12,16 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
         changeGamemode("ship")
         remind = true
         remind2 = false
+        effects.clearParticles(cube)
     } else if (otherSprite.image.equals(assets.image`cubePortal`)) {
         changeGamemode("cube")
         mode = "cube"
         remind = false
         remind2 = false
+        effects.clearParticles(cube)
     } else if (otherSprite.image.equals(assets.image`wavePortal`)) {
         changeGamemode("wave")
+        cube.startEffect(effects.spray)
         remind = false
         remind2 = true
     }
@@ -60,7 +63,7 @@ aPressed = false
 upPressed = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
 let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
-let shipPortal2 = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
+let shipPortal2 = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
 let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
 mode = "cube"
 remind = false
@@ -119,6 +122,8 @@ forever(function () {
     }
     if (remind) {
         mode = "ship"
+    } else if (remind2) {
+        mode = "wave"
     }
     cube.x += 4.5
     if (mode == "cube" && !(on_floor)) {
@@ -178,8 +183,10 @@ forever(function () {
     } else if (mode == "wave") {
         if (aPressed || upPressed) {
             cube.y += -4.5
+            cube.setImage(assets.image`wave1`)
         } else {
             cube.y += 4.5
+            cube.setImage(assets.image`wave2`)
         }
     }
 })
