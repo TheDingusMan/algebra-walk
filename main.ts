@@ -11,10 +11,16 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
     if (otherSprite.image.equals(assets.image`shipPortal`)) {
         changeGamemode("ship")
         remind = true
+        remind2 = false
     } else if (otherSprite.image.equals(assets.image`cubePortal`)) {
         changeGamemode("cube")
         mode = "cube"
         remind = false
+        remind2 = false
+    } else if (otherSprite.image.equals(assets.image`wavePortal`)) {
+        changeGamemode("wave")
+        remind = false
+        remind2 = true
     }
 })
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -30,10 +36,14 @@ function changeGamemode (mode: string) {
     } else if (mode == "ship") {
         cube.setImage(assets.image`ship1`)
         cube.ay = 0
+    } else {
+        cube.setImage(assets.image`wave2`)
+        cube.ay = 0
     }
 }
 let count2 = 0
 let count = 0
+let remind2 = false
 let remind = false
 let mode = ""
 let cube: Sprite = null
@@ -54,6 +64,7 @@ let shipPortal2 = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
 let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
 mode = "cube"
 remind = false
+remind2 = false
 cube.ay = 625
 cube.setPosition(20, 235)
 tiles.setCurrentTilemap(tilemap`level`)
@@ -92,26 +103,6 @@ game.onUpdate(function () {
         scene.setBackgroundColor(14)
     } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color15`)) {
         scene.setBackgroundColor(15)
-    }
-})
-forever(function () {
-    if (mode == "cube" && (aPressed || upPressed) && on_floor) {
-        on_floor = false
-        cube.vy = -200
-    } else if (mode == "ship") {
-        if (aPressed || upPressed) {
-            if (cube.vy < -200) {
-                cube.vy = -200
-            } else {
-                cube.vy += -7
-            }
-        } else {
-            if (cube.vy > 200) {
-                cube.vy = 200
-            } else {
-                cube.vy += 7
-            }
-        }
     }
 })
 forever(function () {
@@ -164,5 +155,31 @@ forever(function () {
         }
     } else {
         on_floor = false
+    }
+})
+forever(function () {
+    if (mode == "cube" && (aPressed || upPressed) && on_floor) {
+        on_floor = false
+        cube.vy = -200
+    } else if (mode == "ship") {
+        if (aPressed || upPressed) {
+            if (cube.vy < -200) {
+                cube.vy = -200
+            } else {
+                cube.vy += -7
+            }
+        } else {
+            if (cube.vy > 200) {
+                cube.vy = 200
+            } else {
+                cube.vy += 7
+            }
+        }
+    } else if (mode == "wave") {
+        if (aPressed || upPressed) {
+            cube.y += -4.5
+        } else {
+            cube.y += 4.5
+        }
     }
 })
