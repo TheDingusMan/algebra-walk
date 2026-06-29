@@ -57,7 +57,7 @@ namespace userconfig {
     export const ARCADE_SCREEN_HEIGHT = 160
 }
 music.play(music.createSong(assets.song`stereoMadnent`), music.PlaybackMode.InBackground)
-scene.setBackgroundColor(9)
+scene.setBackgroundColor(6)
 let on_floor = true
 aPressed = false
 upPressed = false
