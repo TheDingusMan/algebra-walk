@@ -1,5 +1,6 @@
 namespace SpriteKind {
     export const Portal = SpriteKind.create()
+    export const SizePortal = SpriteKind.create()
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     upPressed = true
@@ -37,10 +38,23 @@ controller.A.onEvent(ControllerButtonEvent.Released, function () {
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
     upPressed = false
 })
+sprites.onOverlap(SpriteKind.Player, SpriteKind.SizePortal, function (sprite, otherSprite) {
+    if (otherSprite.image.equals(assets.image`miniPortal1`)) {
+        cube.scale = 0.5
+        if (mode == "cube") {
+            cube.ay = 312.5
+        }
+    } else if (otherSprite.image.equals(assets.image`miniPortal2`)) {
+        cube.scale = 1
+        if (mode == "cube") {
+            cube.ay = 625
+        }
+    }
+})
 function changeGamemode (mode: string) {
     if (mode == "cube") {
         cube.setImage(assets.image`cube4`)
-        cube.ay = 625
+        cube.ay = 625 * cube.scale
     } else if (mode == "ship") {
         cube.setImage(assets.image`ship1`)
         cube.ay = 0
@@ -68,8 +82,10 @@ aPressed = false
 upPressed = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
 let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
-let shipPortal2 = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
+let wavePortal = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
 let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
+let miniPortal = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
+let normalPortal = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
 mode = "cube"
 remind = false
 remind2 = false
@@ -78,7 +94,9 @@ cube.setPosition(28, 235)
 tiles.setCurrentTilemap(tilemap`level`)
 tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
-tiles.placeOnTile(shipPortal2, tiles.getTileLocation(240, 2))
+tiles.placeOnTile(wavePortal, tiles.getTileLocation(240, 2))
+tiles.placeOnTile(miniPortal, tiles.getTileLocation(138, 8))
+tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 7))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
@@ -182,28 +200,28 @@ forever(function () {
 forever(function () {
     if (mode == "cube" && (aPressed || upPressed) && on_floor) {
         on_floor = false
-        cube.vy = -200
+        cube.vy = -200 * cube.scale
     } else if (mode == "ship") {
         if (aPressed || upPressed) {
-            if (cube.vy < -200) {
-                cube.vy = -200
+            if (cube.vy < -200 / cube.scale) {
+                cube.vy = -200 / cube.scale
             } else {
-                cube.vy += -7
+                cube.vy += -7 / cube.scale
             }
         } else {
-            if (cube.vy > 200) {
-                cube.vy = 200
+            if (cube.vy > 200 / cube.scale) {
+                cube.vy = 200 / cube.scale
             } else {
-                cube.vy += 7
+                cube.vy += 7 / cube.scale
             }
         }
     } else if (mode == "wave") {
         if (aPressed || upPressed) {
             cube.vy = -0.01
-            cube.y += -4.5
+            cube.y += -4.5 / cube.scale
         } else {
             cube.vy = 0.01
-            cube.y += 4.5
+            cube.y += 4.5 / cube.scale
         }
     }
 })
