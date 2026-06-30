@@ -330,16 +330,16 @@ f 6 6 6 6 f 7 7 f . .
 `;
             case "image13":
             case "wave0":return img`
-. . . f f . . . . . . 
-. . . f 7 f f . . . . 
-f f f f 7 7 7 f . . . 
-f 6 6 f 7 7 7 7 f f . 
-. f 6 f 7 7 7 7 7 7 f 
-. f 6 f 7 7 7 7 7 7 f 
-f 6 6 f 7 7 7 7 f f . 
-f f f f 7 7 7 f . . . 
-. . . f 7 f f . . . . 
-. . . f f . . . . . . 
+. . . f f f . . . . . . . 
+. . . f 7 7 f f . . . . . 
+f f f f 7 7 7 7 f f . . . 
+f 6 6 f 7 7 7 7 7 7 f f . 
+. f 6 f 7 7 7 7 7 7 7 7 f 
+. f 6 f 7 7 7 7 7 7 7 7 f 
+f 6 6 f 7 7 7 7 7 7 f f . 
+f f f f 7 7 7 7 f f . . . 
+. . . f 7 7 f f . . . . . 
+. . . f f f . . . . . . . 
 `;
         }
         return null;

@@ -13,6 +13,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
         remind = true
         remind2 = false
         effects.clearParticles(cube)
+        cube.startEffect(effects.spray)
+        cube.startEffect(effects.spray)
     } else if (otherSprite.image.equals(assets.image`cubePortal`)) {
         changeGamemode("cube")
         mode = "cube"
@@ -21,7 +23,10 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
         effects.clearParticles(cube)
     } else if (otherSprite.image.equals(assets.image`wavePortal`)) {
         changeGamemode("wave")
-        cube.startEffect(effects.spray)
+        effects.clearParticles(cube)
+        for (let index = 0; index < 5; index++) {
+            cube.startEffect(effects.spray)
+        }
         remind = false
         remind2 = true
     }
@@ -69,7 +74,7 @@ mode = "cube"
 remind = false
 remind2 = false
 cube.ay = 625
-cube.setPosition(20, 235)
+cube.setPosition(28, 235)
 tiles.setCurrentTilemap(tilemap`level`)
 tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
@@ -118,6 +123,9 @@ forever(function () {
         game.gameOver(false)
     }
     if (cube.tileKindAt(TileDirection.Center, assets.tile`goal`)) {
+        scene.cameraShake(8, 1000)
+        sprites.destroy(cube)
+        pause(1000)
         game.gameOver(true)
     }
     if (remind) {
