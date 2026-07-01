@@ -76,6 +76,7 @@ namespace userconfig {
     export const ARCADE_SCREEN_HEIGHT = 160
 }
 music.play(music.createSong(assets.song`stereoMadnent`), music.PlaybackMode.InBackground)
+game.setGameOverPlayable(false, music.createSong(assets.song`death`), false)
 scene.setBackgroundColor(9)
 let on_floor = true
 aPressed = false
