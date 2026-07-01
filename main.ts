@@ -96,7 +96,7 @@ tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
 tiles.placeOnTile(wavePortal, tiles.getTileLocation(240, 2))
 tiles.placeOnTile(miniPortal, tiles.getTileLocation(138, 8))
-tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 7))
+tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 6))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
