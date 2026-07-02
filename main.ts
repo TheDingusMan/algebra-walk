@@ -89,7 +89,7 @@ namespace userconfig {
 music.play(music.createSong(assets.song`stereoMadnent`), music.PlaybackMode.InBackground)
 game.setGameOverPlayable(false, music.createSong(assets.song`death`), false)
 game.setGameOverPlayable(true, music.createSong(assets.song`win`), false)
-scene.setBackgroundColor(5)
+scene.setBackgroundColor(9)
 let on_floor = true
 aPressed = false
 upPressed = false
