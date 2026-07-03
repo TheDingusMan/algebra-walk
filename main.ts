@@ -19,6 +19,8 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherSprite) {
     if (otherSprite.image.equals(assets.image`shipPortal`)) {
+        count = 0
+        count2 = 0
         changeGamemode("ship")
         mode = "ship"
         effects.clearParticles(cube)
@@ -36,6 +38,8 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
             cube.startEffect(effects.spray)
         }
     } else if (otherSprite.image.equals(assets.image`ballPortal`)) {
+        count = 0
+        count2 = 0
         changeGamemode("ball")
         mode = "ball"
         effects.clearParticles(cube)
@@ -309,7 +313,7 @@ forever(function () {
         cube.vy = 0
     } else if (mode == "ball") {
         count += 1
-        if (count == 4) {
+        if (count == 3) {
             count = 0
             count2 += 1
             if (count2 == 1) {
