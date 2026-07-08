@@ -59,12 +59,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.SizePortal, function (sprite, ot
     if (otherSprite.image.equals(assets.image`miniPortal1`)) {
         cube.scale = 0.5
         if (mode == "cube") {
-            cube.ay = 312.5
+            cube.ay = 312.5 * gravity
         }
     } else if (otherSprite.image.equals(assets.image`miniPortal2`)) {
         cube.scale = 1
         if (mode == "cube") {
-            cube.ay = 625
+            cube.ay = 625 * gravity
         }
     }
 })
