@@ -5,6 +5,7 @@ namespace SpriteKind {
 }
 controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
     upPressed = true
+    upBuffer = true
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.GravityPortal, function (sprite, otherSprite) {
     if (otherSprite.rotationDegrees != 360) {
@@ -16,6 +17,7 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.GravityPortal, function (sprite,
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     aPressed = true
+    aBuffer = true
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherSprite) {
     if (otherSprite.image.equals(assets.image`shipPortal`)) {
@@ -47,9 +49,11 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
 })
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
     aPressed = false
+    aBuffer = false
 })
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
     upPressed = false
+    upBuffer = false
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.SizePortal, function (sprite, otherSprite) {
     if (otherSprite.image.equals(assets.image`miniPortal1`)) {
@@ -84,6 +88,8 @@ let count = 0
 let gravity = 0
 let mode = ""
 let cube: Sprite = null
+let upBuffer = false
+let aBuffer = false
 let upPressed = false
 let aPressed = false
 namespace userconfig {
@@ -97,6 +103,8 @@ scene.setBackgroundColor(5)
 let on_floor = true
 aPressed = false
 upPressed = false
+aBuffer = false
+upBuffer = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
 let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
 let wavePortal = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
@@ -104,10 +112,11 @@ let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
 let miniPortal = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
 let miniPortal2 = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
 let normalPortal = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
+let normalPortal2 = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
 let ballPortal = sprites.create(assets.image`ballPortal`, SpriteKind.Portal)
 let flipPortal = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 let flipPortal2 = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
-mode = "cube"
+mode = "ball"
 let currentTilemap = 0
 gravity = 1
 cube.ay = 625
@@ -115,10 +124,11 @@ cube.setPosition(28, 235)
 tiles.setCurrentTilemap(tilemap`level`)
 tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
-tiles.placeOnTile(wavePortal, tiles.getTileLocation(221, 6))
+tiles.placeOnTile(wavePortal, tiles.getTileLocation(222, 5))
 tiles.placeOnTile(miniPortal, tiles.getTileLocation(138, 8))
 tiles.placeOnTile(miniPortal2, tiles.getTileLocation(217, 7))
 tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 6))
+tiles.placeOnTile(normalPortal2, tiles.getTileLocation(238, 2))
 tiles.placeOnTile(ballPortal, tiles.getTileLocation(180, 6))
 tiles.placeOnTile(flipPortal, tiles.getTileLocation(197, 7))
 tiles.placeOnTile(flipPortal2, tiles.getTileLocation(217, 7))
@@ -179,10 +189,9 @@ forever(function () {
     cube.x += 4.5
     if (cube.tilemapLocation().column == 255) {
         cube.x = 0
-        if (currentTilemap == 0) {
-        	
-        } else if (false) {
-        	
+        currentTilemap += 1
+        if (currentTilemap == 1) {
+            tiles.setCurrentTilemap(tilemap`level2`)
         }
     }
     if (gravity == 1) {
@@ -251,10 +260,12 @@ forever(function () {
             cube.vy = 0.01 * gravity
             cube.y += 4.5 / cube.scale * gravity
         }
-    } else if (mode == "ball" && (on_floor && (aPressed || upPressed))) {
+    } else if (mode == "ball" && (on_floor && (aBuffer || upBuffer))) {
         cube.ay = cube.ay * -1
         gravity = gravity * -1
         cube.vy = 50 * cube.scale * gravity
+        aBuffer = false
+        upBuffer = false
     }
 })
 forever(function () {
