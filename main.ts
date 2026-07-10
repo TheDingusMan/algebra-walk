@@ -3,21 +3,13 @@ namespace SpriteKind {
     export const SizePortal = SpriteKind.create()
     export const GravityPortal = SpriteKind.create()
 }
-controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-    upPressed = true
-    upBuffer = true
-})
 sprites.onOverlap(SpriteKind.Player, SpriteKind.GravityPortal, function (sprite, otherSprite) {
-    if (otherSprite.rotationDegrees != 360) {
+    if (otherSprite.rotationDegrees < 360) {
         cube.ay = cube.ay * -1
         gravity = gravity * -1
         cube.vy = -50 * gravity
-        otherSprite.rotationDegrees = 360
+        otherSprite.rotationDegrees += 360
     }
-})
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    aPressed = true
-    aBuffer = true
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherSprite) {
     if (otherSprite.image.equals(assets.image`shipPortal`)) {
@@ -45,6 +37,35 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.Portal, function (sprite, otherS
         changeGamemode("ball")
         mode = "ball"
         effects.clearParticles(cube)
+    } else if (otherSprite.image.equals(assets.image`ufoPortal`)) {
+        count = 0
+        count2 = 0
+        changeGamemode("ufo")
+        mode = "ufo"
+        effects.clearParticles(cube)
+        cube.startEffect(effects.trail)
+    }
+})
+controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
+    if (mode == "ufo") {
+        jumping = true
+        count = 0
+        count2 = 0
+        cube.vy = (-100 * cube.scale - 75) * gravity
+        cube.startEffect(effects.spray, 500)
+    }
+    upPressed = true
+    upBuffer = true
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    aPressed = true
+    aBuffer = true
+    if (mode == "ufo") {
+        jumping = true
+        count = 0
+        count2 = 0
+        cube.vy = (-100 * cube.scale - 75) * gravity
+        cube.startEffect(effects.spray, 500)
     }
 })
 controller.A.onEvent(ControllerButtonEvent.Released, function () {
@@ -59,12 +80,16 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.SizePortal, function (sprite, ot
     if (otherSprite.image.equals(assets.image`miniPortal1`)) {
         cube.scale = 0.5
         if (mode == "cube") {
-            cube.ay = 312.5
+            cube.ay = 312.5 * gravity
+        } else if (mode == "ball") {
+            cube.ay = 700 * gravity
         }
     } else if (otherSprite.image.equals(assets.image`miniPortal2`)) {
         cube.scale = 1
         if (mode == "cube") {
-            cube.ay = 625
+            cube.ay = 625 * gravity
+        } else if (mode == "ball") {
+            cube.ay = 625 * gravity
         }
     }
 })
@@ -80,7 +105,18 @@ function changeGamemode (mode: string) {
         cube.ay = 0
     } else if (mode == "ball") {
         cube.setImage(assets.image`ball1`)
-        cube.ay = 625 * gravity
+        if (cube.scale == 1) {
+            cube.ay = 625 * gravity
+        } else if (cube.scale == 0.5) {
+            cube.ay = 700 * gravity
+        }
+    } else if (mode == "ufo") {
+        cube.setImage(assets.image`ufo1`)
+        if (cube.scale == 1) {
+            cube.ay = 625 * gravity
+        } else if (cube.scale == 0.5) {
+            cube.ay = 700 * gravity
+        }
     }
 }
 let count2 = 0
@@ -92,6 +128,7 @@ let upBuffer = false
 let aBuffer = false
 let upPressed = false
 let aPressed = false
+let jumping = false
 namespace userconfig {
     export const ARCADE_SCREEN_WIDTH = 320
     export const ARCADE_SCREEN_HEIGHT = 160
@@ -101,6 +138,7 @@ game.setGameOverPlayable(false, music.createSong(assets.song`death`), false)
 game.setGameOverPlayable(true, music.createSong(assets.song`win`), false)
 scene.setBackgroundColor(5)
 let on_floor = true
+jumping = false
 aPressed = false
 upPressed = false
 aBuffer = false
@@ -110,12 +148,11 @@ let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
 let wavePortal = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
 let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
 let miniPortal = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
-let miniPortal2 = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
 let normalPortal = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
-let normalPortal2 = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
 let ballPortal = sprites.create(assets.image`ballPortal`, SpriteKind.Portal)
 let flipPortal = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 let flipPortal2 = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
+let flipPortal3 = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 mode = "cube"
 let currentTilemap = 0
 gravity = 1
@@ -126,12 +163,11 @@ tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
 tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
 tiles.placeOnTile(wavePortal, tiles.getTileLocation(222, 5))
 tiles.placeOnTile(miniPortal, tiles.getTileLocation(138, 8))
-tiles.placeOnTile(miniPortal2, tiles.getTileLocation(217, 7))
 tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 6))
-tiles.placeOnTile(normalPortal2, tiles.getTileLocation(238, 2))
 tiles.placeOnTile(ballPortal, tiles.getTileLocation(180, 6))
 tiles.placeOnTile(flipPortal, tiles.getTileLocation(197, 7))
-tiles.placeOnTile(flipPortal2, tiles.getTileLocation(217, 7))
+tiles.placeOnTile(flipPortal2, tiles.getTileLocation(215, 6))
+tiles.placeOnTile(flipPortal3, tiles.getTileLocation(222, 5))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
@@ -263,7 +299,7 @@ forever(function () {
     } else if (mode == "ball" && (on_floor && (aBuffer || upBuffer))) {
         cube.ay = cube.ay * -1
         gravity = gravity * -1
-        cube.vy = 50 * cube.scale * gravity
+        cube.vy = 50 / cube.scale * gravity
         aBuffer = false
         upBuffer = false
     }
@@ -332,6 +368,29 @@ forever(function () {
             } else {
                 count2 = 0
                 cube.setImage(assets.image`ball1`)
+            }
+        }
+    } else if (mode == "ufo") {
+        if (jumping) {
+            if (gravity == 1) {
+                cube.setImage(assets.image`ufo2`)
+            } else if (gravity == -1) {
+                cube.setImage(assets.image`flipufo2`)
+            }
+            count += 1
+            if (count == 5) {
+                count = 0
+                count2 += 1
+                if (count2 == 1) {
+                    count2 = 0
+                    jumping = false
+                }
+            }
+        } else {
+            if (gravity == 1) {
+                cube.setImage(assets.image`ufo1`)
+            } else if (gravity == -1) {
+                cube.setImage(assets.image`flipufo1`)
             }
         }
     }
