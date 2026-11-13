@@ -83,6 +83,7 @@ function changeGamemode (mode: string) {
         cube.ay = 625 * gravity
     }
 }
+let currentTilemap = 0
 let count2 = 0
 let count = 0
 let gravity = 0
@@ -117,7 +118,6 @@ let ballPortal = sprites.create(assets.image`ballPortal`, SpriteKind.Portal)
 let flipPortal = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 let flipPortal2 = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 mode = "cube"
-let currentTilemap = 0
 gravity = 1
 cube.ay = 625
 cube.setPosition(28, 235)
@@ -164,6 +164,74 @@ game.onUpdate(function () {
         scene.setBackgroundColor(14)
     } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color15`)) {
         scene.setBackgroundColor(15)
+    }
+})
+forever(function () {
+    if (mode == "cube" && !(on_floor)) {
+        count += 1
+        if (count == 4) {
+            count = 0
+            count2 += 1
+            if (count2 == 1) {
+                if (gravity == 1) {
+                    cube.setImage(assets.image`cube1`)
+                } else if (gravity == -1) {
+                    cube.setImage(assets.image`cube3`)
+                }
+            } else if (count2 == 2) {
+                cube.setImage(assets.image`cube2`)
+            } else if (count2 == 3) {
+                if (gravity == 1) {
+                    cube.setImage(assets.image`cube3`)
+                } else if (gravity == -1) {
+                    cube.setImage(assets.image`cube1`)
+                }
+            } else {
+                count2 = 0
+                cube.setImage(assets.image`cube4`)
+            }
+        }
+    } else if (mode == "ship") {
+        if (cube.vy < -100) {
+            if (gravity == 1) {
+                cube.setImage(assets.image`ship3`)
+            } else if (gravity == -1) {
+                cube.setImage(assets.image`flipship2`)
+            }
+        } else if (cube.vy > 100) {
+            if (gravity == 1) {
+                cube.setImage(assets.image`ship2`)
+            } else if (gravity == -1) {
+                cube.setImage(assets.image`flipship3`)
+            }
+        } else {
+            if (gravity == 1) {
+                cube.setImage(assets.image`ship1`)
+            } else if (gravity == -1) {
+                cube.setImage(assets.image`flipship1`)
+            }
+        }
+    } else if (mode == "wave") {
+        if (cube.vy < 0) {
+            cube.setImage(assets.image`wave1`)
+        } else if (cube.vy > 0) {
+            cube.setImage(assets.image`wave2`)
+        } else {
+            cube.setImage(assets.image`wave0`)
+        }
+        cube.vy = 0
+    } else if (mode == "ball") {
+        count += 1
+        if (count == 3) {
+            count = 0
+            count2 += 1
+            if (count2 == 1) {
+                cube.setImage(assets.image`ball2`)
+            } else {
+                count2 = 0
+                cube.setImage(assets.image`ball1`)
+            }
+        }
     }
 })
 forever(function () {
@@ -266,73 +334,5 @@ forever(function () {
         cube.vy = 50 * cube.scale * gravity
         aBuffer = false
         upBuffer = false
-    }
-})
-forever(function () {
-    if (mode == "cube" && !(on_floor)) {
-        count += 1
-        if (count == 4) {
-            count = 0
-            count2 += 1
-            if (count2 == 1) {
-                if (gravity == 1) {
-                    cube.setImage(assets.image`cube1`)
-                } else if (gravity == -1) {
-                    cube.setImage(assets.image`cube3`)
-                }
-            } else if (count2 == 2) {
-                cube.setImage(assets.image`cube2`)
-            } else if (count2 == 3) {
-                if (gravity == 1) {
-                    cube.setImage(assets.image`cube3`)
-                } else if (gravity == -1) {
-                    cube.setImage(assets.image`cube1`)
-                }
-            } else {
-                count2 = 0
-                cube.setImage(assets.image`cube4`)
-            }
-        }
-    } else if (mode == "ship") {
-        if (cube.vy < -100) {
-            if (gravity == 1) {
-                cube.setImage(assets.image`ship3`)
-            } else if (gravity == -1) {
-                cube.setImage(assets.image`flipship2`)
-            }
-        } else if (cube.vy > 100) {
-            if (gravity == 1) {
-                cube.setImage(assets.image`ship2`)
-            } else if (gravity == -1) {
-                cube.setImage(assets.image`flipship3`)
-            }
-        } else {
-            if (gravity == 1) {
-                cube.setImage(assets.image`ship1`)
-            } else if (gravity == -1) {
-                cube.setImage(assets.image`flipship1`)
-            }
-        }
-    } else if (mode == "wave") {
-        if (cube.vy < 0) {
-            cube.setImage(assets.image`wave1`)
-        } else if (cube.vy > 0) {
-            cube.setImage(assets.image`wave2`)
-        } else {
-            cube.setImage(assets.image`wave0`)
-        }
-        cube.vy = 0
-    } else if (mode == "ball") {
-        count += 1
-        if (count == 3) {
-            count = 0
-            count2 += 1
-            if (count2 == 1) {
-                cube.setImage(assets.image`ball2`)
-            } else {
-                count2 = 0
-                cube.setImage(assets.image`ball1`)
-            }
-        }
     }
 })
