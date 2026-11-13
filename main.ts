@@ -60,10 +60,12 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.SizePortal, function (sprite, ot
         cube.scale = 0.5
         if (mode == "cube") {
             cube.ay = 312.5
+        } else if (mode == "ball") {
+            cube.ay = 700
         }
     } else if (otherSprite.image.equals(assets.image`miniPortal2`)) {
         cube.scale = 1
-        if (mode == "cube") {
+        if (mode == "cube" || mode == "ball") {
             cube.ay = 625
         }
     }
@@ -83,6 +85,7 @@ function changeGamemode (mode: string) {
         cube.ay = 625 * gravity
     }
 }
+let newPortal: Sprite = null
 let count2 = 0
 let count = 0
 let gravity = 0
@@ -106,32 +109,18 @@ upPressed = false
 aBuffer = false
 upBuffer = false
 cube = sprites.create(assets.image`cube4`, SpriteKind.Player)
-let shipPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
-let wavePortal = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
-let cubePortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
-let miniPortal = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
 let miniPortal2 = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
 let normalPortal = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
 let normalPortal2 = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
-let ballPortal = sprites.create(assets.image`ballPortal`, SpriteKind.Portal)
-let flipPortal = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
-let flipPortal2 = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
 mode = "cube"
 let currentTilemap = 0
 gravity = 1
 cube.ay = 625
 cube.setPosition(28, 235)
 tiles.setCurrentTilemap(tilemap`level`)
-tiles.placeOnTile(shipPortal, tiles.getTileLocation(123, 6))
-tiles.placeOnTile(cubePortal, tiles.getTileLocation(158, 3))
-tiles.placeOnTile(wavePortal, tiles.getTileLocation(222, 5))
-tiles.placeOnTile(miniPortal, tiles.getTileLocation(138, 8))
 tiles.placeOnTile(miniPortal2, tiles.getTileLocation(217, 7))
 tiles.placeOnTile(normalPortal, tiles.getTileLocation(180, 6))
 tiles.placeOnTile(normalPortal2, tiles.getTileLocation(238, 2))
-tiles.placeOnTile(ballPortal, tiles.getTileLocation(180, 6))
-tiles.placeOnTile(flipPortal, tiles.getTileLocation(197, 7))
-tiles.placeOnTile(flipPortal2, tiles.getTileLocation(217, 7))
 scene.cameraFollowSprite(cube)
 game.onUpdate(function () {
     if (tiles.tileAtLocationEquals(tiles.getTileLocation(cube.tilemapLocation().column, 0), assets.tile`color1`)) {
@@ -263,7 +252,7 @@ forever(function () {
     } else if (mode == "ball" && (on_floor && (aBuffer || upBuffer))) {
         cube.ay = cube.ay * -1
         gravity = gravity * -1
-        cube.vy = 50 * cube.scale * gravity
+        cube.vy = 50 / cube.scale * gravity
         aBuffer = false
         upBuffer = false
     }
@@ -324,15 +313,71 @@ forever(function () {
         cube.vy = 0
     } else if (mode == "ball") {
         count += 1
-        if (count == 3) {
-            count = 0
-            count2 += 1
-            if (count2 == 1) {
-                cube.setImage(assets.image`ball2`)
-            } else {
-                count2 = 0
-                cube.setImage(assets.image`ball1`)
+        if (on_floor) {
+            if (count > 2) {
+                count = 0
             }
+            if (count == 2) {
+                count = 0
+                count2 += 1
+                if (count2 == 1) {
+                    cube.setImage(assets.image`ball2`)
+                } else {
+                    count2 = 0
+                    cube.setImage(assets.image`ball1`)
+                }
+            }
+        } else {
+            if (count == 4) {
+                count = 0
+                count2 += 1
+                if (count2 == 1) {
+                    cube.setImage(assets.image`ball2`)
+                } else {
+                    count2 = 0
+                    cube.setImage(assets.image`ball1`)
+                }
+            }
+        }
+    }
+})
+game.onUpdate(function () {
+    for (let value of tiles.getTilesByType(assets.tile`portalTile`)) {
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color1`)) {
+            newPortal = sprites.create(assets.image`cubePortal`, SpriteKind.Portal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color2`)) {
+            newPortal = sprites.create(assets.image`shipPortal`, SpriteKind.Portal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color3`)) {
+            newPortal = sprites.create(assets.image`wavePortal`, SpriteKind.Portal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color4`)) {
+            newPortal = sprites.create(assets.image`ballPortal`, SpriteKind.Portal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color5`)) {
+            newPortal = sprites.create(assets.image`miniPortal1`, SpriteKind.SizePortal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color6`)) {
+            newPortal = sprites.create(assets.image`miniPortal2`, SpriteKind.SizePortal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(value.column + 1, value.row), assets.tile`color7`)) {
+            newPortal = sprites.create(assets.image`flipPortal`, SpriteKind.GravityPortal)
+            tiles.placeOnTile(newPortal, tiles.getTileLocation(value.column, value.row))
+            tiles.setTileAt(tiles.getTileLocation(value.column, value.row), assets.tile`transparency16`)
+            tiles.setTileAt(tiles.getTileLocation(value.column + 1, value.row), assets.tile`transparency16`)
         }
     }
 })
